@@ -1,0 +1,9 @@
+--only one file location for the program (check to see if one already exists)
+--Make sure file location that is added exists
+--Emoji support
+--Better interface
+--Voice input
+
+--Favorites
+--Add -remove index, -remove filetype
+--Make systray do something
