@@ -33,3 +33,5 @@ Build my own Finder application. Can index directories and search through them.
 - If that program is the only one with that name, the program is launched.
 - Otherwise, a list of any programs containing the name is shown.
 - If multiple programs are listed, the user can just press enter to select the top one.
+
+- Once a program is selected, the window disappears. Pressing CTRL+ALT+F will bring the window back, ready to search again.
