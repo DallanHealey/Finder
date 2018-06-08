@@ -24,6 +24,9 @@ Build my own Finder application. Can index directories and search through them.
    - Walks through all the directories and indexes files that have 
     an extension predefined by the user.
     
+- \-quit
+  - Quits the program.
+    
 # Files
 - Files are stored in %APPDATA%/Finder as index.txt and filetypes.txt.
    - If files are edited manually, user needs to do -reload for the changes to take affect.
