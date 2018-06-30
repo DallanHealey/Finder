@@ -18,6 +18,7 @@ int strlen(const wchar_t* string);
 
 bool hasSuffix(const std::wstring &str, const std::wstring &suffix);
 HANDLE clearScreenAndResetCursor();
+void resetCurosr(COORD consoleCoords);
 void listIndexedFiles(std::multimap<std::wstring, std::wstring> &indexedFiles);
 void listPossibilities(std::vector<std::multimap<std::wstring, std::wstring>::iterator> *possibilities, const std::string *input);
 void listIndexDirectories(std::vector<std::wstring> directories);

@@ -281,8 +281,20 @@ void readDirectory(std::wstring directory) {
 
 
 void readDirectory(std::vector<std::wstring> directories) {
-	for (int i = 0; i < directories.size(); i++)
+	std::wstring statusText = L"Reading directory ";
+	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)statusText.c_str(), statusText.length(), NULL, NULL);
+
+	LPPOINT currentCursorPos = ;
+	COORD newCoords;
+
+	for (int i = 0; i < directories.size(); i++) {
+		std::string	statusNumber = i + " of " + directories.size();
+		GetCursorPos(currentCursorPos);
+		//newCoords = {currentCursorPos}
+		//resetCurosr();
 		readDirectory(directories.at(i));
+		//TODO: Find a way to reset cursor back so I can update the text for each new directory scanned.
+	}
 }
 
 INDEXED_FILE *setFileData(WIN32_FIND_DATA &findData) {
@@ -314,10 +326,17 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 		return NULL;
 	}
 	else if (strcmp(input.c_str(), "-reload") == 0) {
-		std::wstring reloading = L"Reading index file...\n";
+		
+		std::wstring reloading = L"Reading Filetypes File...\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reloading.c_str(), reloading.length(), NULL, NULL);
 		filetypes = readFiletypesFile();
+		
+		reloading = L"Reading Index File...\n";
+		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reloading.c_str(), reloading.length(), NULL, NULL);
 		indexDirectories = readIndexFile();
+		
+		reloading = L"Reading Directories...\n";
+		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reloading.c_str(), reloading.length(), NULL, NULL);
 		readDirectory(indexDirectories);
 		needClear = true;
 		return NULL;

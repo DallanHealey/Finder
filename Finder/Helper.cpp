@@ -89,10 +89,14 @@ HANDLE clearScreenAndResetCursor() {
 	
 	GetConsoleScreenBufferInfo(consoleHandle, &screen);
 	FillConsoleOutputCharacter(consoleHandle, L' ', screen.dwSize.X * screen.dwSize.Y, consoleCoords, &written);
-	SetConsoleCursorPosition(consoleHandle, consoleCoords);
+	resetCurosr(consoleCoords);
 	#endif
 
 	return consoleHandle;
+}
+
+void resetCurosr(COORD consoleCoords) {
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), consoleCoords);
 }
 
 void listIndexedFiles(std::multimap<std::wstring, std::wstring> &indexedFiles) {
