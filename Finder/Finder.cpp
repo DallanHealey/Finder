@@ -30,7 +30,7 @@ static bool windowHidden = false;
 static bool keepRunning;
 static bool needClear = true;
 
-//Used for System Tray Icon
+// Used for System Tray Icon
 static UUID guid;
 
 
@@ -55,7 +55,7 @@ int createIndexFile() {
 
 	CloseHandle(file);
 
-	//FILE_ALREADY_EXISTS
+	// FILE_ALREADY_EXISTS
 	if (error != 183) {
 		return 0;
 	}
@@ -64,7 +64,7 @@ int createIndexFile() {
 }
 
 std::vector<std::wstring> readIndexFile() {
-	//Read index.txt so that we can search the directories that the user specified.
+	// Read index.txt so that we can search the directories that the user specified.
 
 	std::string filepath = getAppdataLocation();
 	filepath += "\\Finder\\index.txt";
@@ -147,7 +147,7 @@ void appendIndexFile(std::wstring append) {
 		std::wstring open = L"Directory is already indexed\n\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)open.c_str(), open.length(), NULL, NULL);
 		
-		//TODO: Figure out a way to make this not clear everytime
+		// TODO: Figure out a way to make this not clear everytime
 		//      Should not be this hard!
 
 		return;
@@ -156,11 +156,11 @@ void appendIndexFile(std::wstring append) {
 	WIN32_FIND_DATA findData;
 	auto hFind = FindFirstFile(append.c_str(), &findData);
 	if (INVALID_HANDLE_VALUE == hFind) {
-		//File does not exist
+		// File does not exist
 		std::wstring open = L"Folder does not exist\n\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)open.c_str(), open.length(), NULL, NULL);
 
-		//TODO: Figure out a way to make this not clear everytime
+		// TODO: Figure out a way to make this not clear everytime
 		//      Should not be this hard!
 
 		return;
@@ -281,19 +281,30 @@ void readDirectory(std::wstring directory) {
 
 
 void readDirectory(std::vector<std::wstring> directories) {
-	std::wstring statusText = L"Reading directory ";
-	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)statusText.c_str(), statusText.length(), NULL, NULL);
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	LPPOINT currentCursorPos = ;
+	std::wstring statusText = L"Reading directory: ";
+	WriteConsole(console, (CHAR_INFO*)statusText.c_str(), statusText.length(), NULL, NULL);
+
 	COORD newCoords;
 
+	std::wstring spaces = L" ";
+
 	for (int i = 0; i < directories.size(); i++) {
-		std::string	statusNumber = i + " of " + directories.size();
-		GetCursorPos(currentCursorPos);
-		//newCoords = {currentCursorPos}
-		//resetCurosr();
+		std::string	statusNumber = std::to_string(i) + " of " + std::to_string(directories.size());
+
+		CONSOLE_SCREEN_BUFFER_INFO screen;
+		GetConsoleScreenBufferInfo(console, &screen);
+		newCoords.X = screen.dwCursorPosition.X - directories.size() - 4 - i; // Resets x of line to point to the space at the end of statusText
+		newCoords.Y = screen.dwCursorPosition.Y;
+
+
+		WriteConsole(console, (CHAR_INFO*)s2ws(statusNumber).c_str(), statusNumber.length(), NULL, NULL);
+		resetCurosr(newCoords);
+
 		readDirectory(directories.at(i));
-		//TODO: Find a way to reset cursor back so I can update the text for each new directory scanned.
+		// TODO: Find a way to reset cursor back so I can update the text for each new directory scanned.
+		//		 Still an issue with this.
 	}
 }
 
@@ -342,7 +353,7 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 		return NULL;
 	}
 	else if (input.find("-add index") != std::string::npos) {
-		auto append = split(s2ws(input.substr(11, input.length() - 1)).c_str(), ';'); //11 is the amount of characters before we want to start checking args.
+		auto append = split(s2ws(input.substr(11, input.length() - 1)).c_str(), ';'); // 11 is the amount of characters before we want to start checking args.
 
 		for (int i = 0; i < append.size(); i++)
 			appendIndexFile(append.at(i));
@@ -350,7 +361,7 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 		return NULL;
 	} 
 	else if (input.find("-add filetype") != std::string::npos) {
-		auto append = split(s2ws(input.substr(14, input.length() - 1)).c_str(), ';'); //14 is the amount of characters before we want to start checking args.
+		auto append = split(s2ws(input.substr(14, input.length() - 1)).c_str(), ';'); // 14 is the amount of characters before we want to start checking args.
 
 		for (int i = 0; i < append.size(); i++)
 			appendFiletypes(append.at(i));
@@ -382,7 +393,7 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 	}
 	else {
 		OutputDebugString(L"Could not launch program\n");
-		//TODO: Add a better way to handle the program not existing
+		// TODO: Add a better way to handle the program not existing
 		std::wstring error = s2ws(input) + L" does not exist. Please search again.\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*) error.c_str(), error.length(), NULL, NULL);
 		couldNotLaunch = true;
@@ -406,7 +417,7 @@ void addSystemTray() {
 	nid.guidItem = (GUID) guid;
 	StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Finder");
 
-	//Add icon
+	// Add icon
 	LoadIconMetric(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1), LIM_SMALL, &nid.hIcon);
 
 	Shell_NotifyIcon(NIM_ADD, &nid) ? S_OK : E_FAIL;
