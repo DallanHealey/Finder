@@ -21,6 +21,9 @@
 
 //TODO: Make WriteFile have Unicode support. Currently wstrings are being converted back to strings.
 
+//BUG: Issue after searching for "Steam" then doing -index. Application is hid.
+
+
 std::vector<std::wstring> filetypes;
 std::vector<std::wstring> indexDirectories;
 std::vector<std::map<std::wstring, std::wstring>::iterator> possiblities;
@@ -318,6 +321,7 @@ INDEXED_FILE *setFileData(WIN32_FIND_DATA &findData) {
 }
 
 HINSTANCE readConsoleInputAndLaunchProgram() {
+
 	std::wstring open = L"Enter a program to open: \n";
 	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)open.c_str(), open.length(), NULL, NULL);
 	std::string input;
@@ -337,15 +341,15 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 		return NULL;
 	}
 	else if (strcmp(input.c_str(), "-reload") == 0) {
-		
+
 		std::wstring reloading = L"Reading Filetypes File...\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reloading.c_str(), reloading.length(), NULL, NULL);
 		filetypes = readFiletypesFile();
-		
+
 		reloading = L"Reading Index File...\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reloading.c_str(), reloading.length(), NULL, NULL);
 		indexDirectories = readIndexFile();
-		
+
 		reloading = L"Reading Directories...\n";
 		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reloading.c_str(), reloading.length(), NULL, NULL);
 		readDirectory(indexDirectories);
@@ -357,9 +361,9 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 
 		for (int i = 0; i < append.size(); i++)
 			appendIndexFile(append.at(i));
-		
+
 		return NULL;
-	} 
+	}
 	else if (input.find("-add filetype") != std::string::npos) {
 		auto append = split(s2ws(input.substr(14, input.length() - 1)).c_str(), ';'); // 14 is the amount of characters before we want to start checking args.
 
@@ -395,11 +399,11 @@ HINSTANCE readConsoleInputAndLaunchProgram() {
 		OutputDebugString(L"Could not launch program\n");
 		// TODO: Add a better way to handle the program not existing
 		std::wstring error = s2ws(input) + L" does not exist. Please search again.\n";
-		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*) error.c_str(), error.length(), NULL, NULL);
+		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)error.c_str(), error.length(), NULL, NULL);
 		couldNotLaunch = true;
 		needClear = false;
 	}
-	
+
 	if (!windowHidden && !couldNotLaunch) {
 		ShowWindow(GetConsoleWindow(), 0);
 		windowHidden = true;
@@ -444,6 +448,9 @@ int main() {
 	reading = L"Reading Index File...\n";
 	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), (CHAR_INFO*)reading, strlen(reading), NULL, NULL);
 	indexDirectories = readIndexFile();
+
+	// Remove the previous messages. They are just status text.
+	clearScreenAndResetCursor();
 
 	readDirectory(indexDirectories);
 
